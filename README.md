@@ -1,11 +1,7 @@
-# AirBnB Clone
+AirBnB_clone - The console
 
-This project is an implementation of a simplified version of the AirBnB website. It includes a command-line interface (CLI) for managing objects in the application such as users, places, reviews, and more.
+How to start it:
 
-## Command Interpreter
+How to use it:
 
-### How to Start
-
-To start the command interpreter, follow these steps:
-
-1. Clone the repository to your local machine:
+Examples:
