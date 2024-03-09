@@ -1,23 +1,118 @@
+#!/usr/bin/python3
+"""
+Contains the class TestConsoleDocs
+"""
+
+import console
+from contextlib import redirect_stdout
+import inspect
+import io
+import os
+import pep8
 import unittest
-from unittest.mock import patch
-from io import StringIO
-from console import HBNBCommand
+HBNBCommand = console.HBNBCommand
 
-class TestConsole(unittest.TestCase):
-    def test_help(self):
-        with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd("help")
-            output = f.getvalue().strip()
-            self.assertIn("Documented commands (type help <topic>):", output)
-            self.assertIn("EOF  help  quit", output)
 
-    def test_create(self):
-        with patch('sys.stdout', new=StringIO()) as f:
-            HBNBCommand().onecmd("create User")
-            output = f.getvalue().strip()
-            self.assertTrue(output)
+class TestConsoleDocs(unittest.TestCase):
+    """Class for testing documentation of the console"""
 
-    # Add more test cases for other console commands here
+    def test_pep8_conformance_console(self):
+        """Test that console.py conforms to PEP8."""
+        pep8s = pep8.StyleGuide(quiet=True)
+        result = pep8s.check_files(['console.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
 
-if __name__ == '__main__':
-    unittest.main()
+    def test_pep8_conformance_test_console(self):
+        """Test that tests/test_console.py conforms to PEP8."""
+        pep8s = pep8.StyleGuide(quiet=True)
+        result = pep8s.check_files(['tests/test_console.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors (and warnings).")
+
+    def test_console_module_docstring(self):
+        """Test for the console.py module docstring"""
+        self.assertIsNot(console.__doc__, None,
+                         "console.py needs a docstring")
+        self.assertTrue(len(console.__doc__) >= 1,
+                        "console.py needs a docstring")
+
+    def test_HBNBCommand_class_docstring(self):
+        """Test for the HBNBCommand class docstring"""
+        self.assertIsNot(HBNBCommand.__doc__, None,
+                         "HBNBCommand class needs a docstring")
+        self.assertTrue(len(HBNBCommand.__doc__) >= 1,
+                        "HBNBCommand class needs a docstring")
+
+
+class TestConsoleCommands(unittest.TestCase):
+    """Class to test functionality of console commands"""
+
+    @classmethod
+    def setUpClass(cls):
+        """Create command console to test with"""
+        cls.cmdcon = HBNBCommand()
+
+    def setUp(self):
+        """Create in-memory buffer to capture stdout"""
+        self.output = io.StringIO()
+
+    def tearDown(self):
+        """Close in-memory buffer after test completes"""
+        self.output.close()
+
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') == 'db',
+                     "Testing DBStorage")
+    def test_do_create(self):
+        """Test do_create method of console"""
+        with redirect_stdout(self.output):
+            self.cmdcon.onecmd('create')
+            self.assertEqual(self.output.getvalue(),
+                             "** class name missing **\n")
+            self.output.seek(0)
+            self.output.truncate()
+            self.cmdcon.onecmd('create blah')
+            self.assertEqual(self.output.getvalue(),
+                             "** class doesn't exist **\n")
+            self.output.seek(0)
+            self.output.truncate()
+            self.cmdcon.onecmd('create State')
+            self.assertRegex(self.output.getvalue(),
+                             '[a-z0-9]{8}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{12}')
+            self.output.seek(0)
+            self.output.truncate()
+            self.cmdcon.onecmd('create State name="California"')
+            self.assertRegex(self.output.getvalue(),
+                             '[a-z0-9]{8}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{12}')
+
+    @unittest.skipIf(os.getenv('HBNB_TYPE_STORAGE') != 'db',
+                     "Testing DBStorage")
+    def test_do_create_db(self):
+        """Test do_create method of console"""
+        with redirect_stdout(self.output):
+            self.cmdcon.onecmd('create')
+            self.assertEqual(self.output.getvalue(),
+                             "** class name missing **\n")
+            self.output.seek(0)
+            self.output.truncate()
+            self.cmdcon.onecmd('create blah')
+            self.assertEqual(self.output.getvalue(),
+                             "** class doesn't exist **\n")
+            self.output.seek(0)
+            self.output.truncate()
+            self.cmdcon.onecmd('create State name="California"')
+            id = self.output.getvalue()
+            self.assertRegex(id,
+                             '[a-z0-9]{8}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{4}-'
+                             '[a-z0-9]{12}')
