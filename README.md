@@ -1,14 +1,11 @@
-# AirBnB_clone
+# AirBnB Clone
 
-## Description
+This project is an implementation of a simplified version of the AirBnB website. It includes a command-line interface (CLI) for managing objects in the application such as users, places, reviews, and more.
 
-This project is a clone of the AirBnB website, which allows users to book and rent properties around the world. The project consists of a command interpreter that can create, retrieve, update, and delete objects of various classes, such as User, Place, City, State, Review, etc. The project also includes a web static part that contains HTML and CSS files for the front-end of the website.
+## Command Interpreter
 
-## Installation
+### How to Start
 
-To install this project, you need to have Python 3.7 or higher installed on your system. You can download Python from here.
+To start the command interpreter, follow these steps:
 
-You also need to clone this repository to your local machine using the command:
-
-```bash
-git clone https://github.com/AirBnB_clone.git
+1. Clone the repository to your local machine:
