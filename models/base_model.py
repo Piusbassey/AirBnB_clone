@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-
+"""This script is the base model"""
 
 import uuid
 from datetime import datetime
@@ -7,14 +7,15 @@ from models import storage
 
 
 class BaseModel:
+
     """Class from which all other classes will inherit"""
 
     def __init__(self, *args, **kwargs):
         """Initializes instance attributes
 
         Args:
-            *args: list of arguments
-            **kwargs: dict of key-value arguments
+            - *args: list of arguments
+            - **kwargs: dict of key-values arguments
         """
 
         if kwargs is not None and kwargs != {}:
@@ -25,8 +26,6 @@ class BaseModel:
                 elif key == "updated_at":
                     self.__dict__["updated_at"] = datetime.strptime(
                         kwargs["updated_at"], "%Y-%m-%dT%H:%M:%S.%f")
-                elif key == "id":
-                    self.__dict__["id"] = kwargs["id"]
                 else:
                     self.__dict__[key] = kwargs[key]
         else:
@@ -36,16 +35,19 @@ class BaseModel:
             storage.new(self)
 
     def __str__(self):
+        """Returns official string representation"""
 
-        return "[{}] ({}) {}".format(type(self).__name__, self.id, self.__dict__)
+        return "[{}] ({}) {}".\
+            format(type(self).__name__, self.id, self.__dict__)
 
     def save(self):
-
+        """updates the public instance attribute updated_at"""
 
         self.updated_at = datetime.now()
         storage.save()
 
     def to_dict(self):
+        """returns a dictionary containing all keys/values of __dict__"""
 
         my_dict = self.__dict__.copy()
         my_dict["__class__"] = type(self).__name__
